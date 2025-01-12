@@ -19,7 +19,8 @@ npm install
 ```
 ### 2. Run
  chạy lệnh sau:
-```npm run dev
+```bash
+npm run dev
 ```
 
 

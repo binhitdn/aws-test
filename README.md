@@ -9,8 +9,8 @@
 ### 1. Clone dự án
 Tải dự án về máy bằng cách chạy lệnh sau:
 ```bash
-git clone https://github.com/binhitdn/study-share-platform.git
-cd study-share-platform
+git clone https://github.com/binhitdn/aws-test.git
+cd aws-test
 ```
 ### 2. Install các package
  chạy lệnh sau:

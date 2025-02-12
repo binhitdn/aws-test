@@ -54,9 +54,13 @@ export default function HomePage() {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (!file) {
+      // Nếu không có file, hiển thị hộp thoại thông báo
       alert('Vui lòng chọn file để upload');
       return;
     }
+    // Debug: in ra file được chọn
+    console.log('Uploading file:', file);
+
     const formData = new FormData();
     formData.append('file', file);
     formData.append('title', title);
@@ -71,6 +75,7 @@ export default function HomePage() {
       const data = await res.json();
       if (res.ok) {
         alert('File uploaded successfully');
+        // Cập nhật danh sách tài liệu sau khi upload thành công
         setDocuments((prev) => [...prev, data.document]);
         setTitle('');
         setDescription('');
@@ -131,8 +136,12 @@ export default function HomePage() {
       {/* Profile */}
       <div className="max-w-3xl mx-auto mt-6 bg-white p-6 rounded shadow">
         <h2 className="text-2xl font-bold mb-4">Profile</h2>
-        <p><strong>Name:</strong> {user.name}</p>
-        <p className="mt-2"><strong>Email:</strong> {user.email}</p>
+        <p>
+          <strong>Name:</strong> {user.name}
+        </p>
+        <p className="mt-2">
+          <strong>Email:</strong> {user.email}
+        </p>
       </div>
 
       {/* Form Upload */}
@@ -155,7 +164,11 @@ export default function HomePage() {
           />
           <input
             type="file"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                setFile(e.target.files[0]);
+              }
+            }}
             className="w-full p-2 border border-gray-300 rounded mb-4"
           />
           <button

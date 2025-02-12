@@ -1,51 +1,44 @@
 // pages/api/documents/upload.js
-import nextConnect from 'next-connect';
+import { createRouter } from 'next-connect';
 import multer from 'multer';
-import { uploadToS3 } from '../../../lib/aws';
-import { prisma } from '../../../lib/prisma';
+import { uploadToS3 } from '../../../lib/aws'; // Đảm bảo bạn đã cấu hình AWS S3
+import prisma from '../../../lib/prisma'; // Đảm bảo bạn đã cấu hình Prisma
 
-const upload = multer({ storage: multer.memoryStorage() });
-
-const handler = nextConnect({
-  onError(error, req, res) {
-    res.status(501).json({ error: `Something went wrong: ${error.message}` });
-  },
-  onNoMatch(req, res) {
-    res.status(405).json({ error: `Method ${req.method} Not Allowed` });
-  },
+// Cấu hình multer để lưu trữ tạm thời trong bộ nhớ
+const upload = multer({
+  storage: multer.memoryStorage(),
 });
 
-handler.use(upload.single('file'));
+// Tạo router với next-connect
+const router = createRouter();
 
-handler.post(async (req, res) => {
+// Sử dụng middleware multer để xử lý file upload
+router.use(upload.single('file')); // 'file' là tên field trong form upload
+
+// Định nghĩa phương thức POST
+router.post(async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
-    
+
     // Upload file lên S3
     const fileUrl = await uploadToS3(req.file);
-    
-    // Lưu thông tin tài liệu vào DB với Prisma
+
+    // Lưu thông tin tài liệu vào cơ sở dữ liệu (dùng Prisma)
     const document = await prisma.document.create({
       data: {
         title: req.body.title,
         description: req.body.description,
         fileUrl: fileUrl,
-        userId: parseInt(req.body.userId), // ép sang số, đảm bảo đúng kiểu
+        userId: req.body.userId, // Giả sử đã có thông tin người dùng
       },
     });
-    
-    return res.status(200).json({ message: 'File uploaded successfully', document });
+
+    res.status(200).json({ message: 'File uploaded successfully', document });
   } catch (error) {
-    return res.status(500).json({ message: 'Error uploading file', error: error.message });
+    res.status(500).json({ message: 'Error uploading file', error: error.message });
   }
 });
 
-export const config = {
-  api: {
-    bodyParser: false, // Tắt bodyParser mặc định để multer hoạt động
-  },
-};
-
-export default handler;
+export default router.handler();

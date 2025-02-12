@@ -1,4 +1,4 @@
-import { prisma } from '../../../lib/prisma';
+import  prisma  from '../../../lib/prisma';
 import { getS3FileUrl } from '../../../lib/aws'; // Tạo hàm để lấy URL tải về từ S3
 
 export default async function handler(req, res) {
